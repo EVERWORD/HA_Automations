@@ -37,7 +37,7 @@ trigger: []
 
 mode: single
 
-sequence:
+action:
   - repeat:
       count: !input repetitions
       sequence:
