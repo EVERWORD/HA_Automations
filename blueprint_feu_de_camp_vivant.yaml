@@ -2,7 +2,7 @@ blueprint:
   name: Feu de Camp RGB (compatibilité IKEA - variation douce)
   description: >
     Simule un feu de camp avec des variations RGB chaudes, adaptées pour les ampoules IKEA RGB.
-    Ajuste la transition et la vitesse pour éviter les incohérences.
+    Transitions longues et changements doux.
   domain: automation
   input:
     ampoules:
@@ -38,7 +38,7 @@ action:
               - service: light.turn_on
                 data:
                   entity_id: "{{ repeat.item }}"
-                  rgb_color: "{{ couleurs1[loop.index0 % couleurs1 | length] }}"
+                  rgb_color: "{{ couleurs1[repeat.index0 % couleurs1 | length] }}"
                   brightness: 200
                   transition: 3
         - delay: "00:00:05"
@@ -48,7 +48,7 @@ action:
               - service: light.turn_on
                 data:
                   entity_id: "{{ repeat.item }}"
-                  rgb_color: "{{ couleurs2[loop.index0 % couleurs2 | length] }}"
+                  rgb_color: "{{ couleurs2[repeat.index0 % couleurs2 | length] }}"
                   brightness: 180
                   transition: 3
         - delay: "00:00:05"
