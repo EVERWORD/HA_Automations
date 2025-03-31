@@ -1,21 +1,23 @@
 blueprint:
-  name: Feu de Camp (optimisé IKEA - Color Temp)
-  description: Effet feu de camp simulé via des variations de température de couleur, compatible avec ampoules IKEA TRÅDFRI.
+  name: Feu de Camp RGB (compatibilité IKEA - variation douce)
+  description: >
+    Simule un feu de camp avec des variations RGB chaudes, adaptées pour les ampoules IKEA RGB.
+    Ajuste la transition et la vitesse pour éviter les incohérences.
   domain: automation
   input:
     ampoules:
-      name: Ampoules IKEA
+      name: Ampoules RGB IKEA
       selector:
         entity:
           domain: light
           multiple: true
     repetitions:
       name: Nombre de cycles
-      default: 10
+      default: 6
       selector:
         number:
           min: 1
-          max: 100
+          max: 30
           unit_of_measurement: "x"
           mode: slider
 
@@ -28,25 +30,25 @@ action:
       count: !input repetitions
       sequence:
         - variables:
-            temp_1: [370, 400, 450, 500]
-            temp_2: [330, 370, 420, 460]
+            couleurs1: [[255, 60, 10], [255, 90, 20], [255, 120, 40], [230, 70, 30]]
+            couleurs2: [[220, 40, 5], [255, 70, 15], [255, 100, 30], [200, 50, 20]]
         - repeat:
             for_each: !input ampoules
             sequence:
               - service: light.turn_on
                 data:
                   entity_id: "{{ repeat.item }}"
-                  color_temp: "{{ temp_1[loop.index0 % temp_1 | length] }}"
+                  rgb_color: "{{ couleurs1[loop.index0 % couleurs1 | length] }}"
                   brightness: 200
-                  transition: 1
-        - delay: "00:00:02"
+                  transition: 3
+        - delay: "00:00:05"
         - repeat:
             for_each: !input ampoules
             sequence:
               - service: light.turn_on
                 data:
                   entity_id: "{{ repeat.item }}"
-                  color_temp: "{{ temp_2[loop.index0 % temp_2 | length] }}"
-                  brightness: 170
-                  transition: 1
-        - delay: "00:00:02"
+                  rgb_color: "{{ couleurs2[loop.index0 % couleurs2 | length] }}"
+                  brightness: 180
+                  transition: 3
+        - delay: "00:00:05"
