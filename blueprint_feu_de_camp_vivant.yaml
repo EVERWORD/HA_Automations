@@ -1,6 +1,6 @@
 blueprint:
   name: Feu de Camp Flexible (multi-ampoules RGB)
-  description: Simule un feu de camp avec des couleurs chaudes variant en douceur sur un nombre illimité d'ampoules RGB.
+  description: Simule un feu de camp avec des couleurs chaudes variant doucement sur un nombre illimité d'ampoules RGB.
   domain: automation
   input:
     ampoules:
@@ -35,20 +35,18 @@ action:
             sequence:
               - service: light.turn_on
                 data:
+                  entity_id: "{{ repeat.item }}"
                   rgb_color: "{{ couleurs1[loop.index0 % couleurs1 | length] }}"
                   brightness: 180
                   transition: 1.5
-                target:
-                  entity_id: "{{ repeat.item }}"
         - delay: "00:00:02"
         - repeat:
             for_each: !input ampoules
             sequence:
               - service: light.turn_on
                 data:
+                  entity_id: "{{ repeat.item }}"
                   rgb_color: "{{ couleurs2[loop.index0 % couleurs2 | length] }}"
                   brightness: 190
                   transition: 1.5
-                target:
-                  entity_id: "{{ repeat.item }}"
         - delay: "00:00:02"
