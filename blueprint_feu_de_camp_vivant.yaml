@@ -1,93 +1,55 @@
 blueprint:
-  name: Feu de Camp Vivant (RGB décalé)
-  description: Simule un feu de camp avec des couleurs chaudes décalées sur 4 ampoules RGB, avec transitions douces.
+  name: Feu de Camp Flexible (multi-ampoules RGB)
+  description: Simule un feu de camp avec des couleurs chaudes variant en douceur sur un nombre illimité d'ampoules RGB.
   domain: automation
   input:
-    ampoule_1:
-      name: Ampoule 1
+    ampoules:
+      name: Ampoules RGB
       selector:
-        entity:
-          domain: light
-    ampoule_2:
-      name: Ampoule 2
-      selector:
-        entity:
-          domain: light
-    ampoule_3:
-      name: Ampoule 3
-      selector:
-        entity:
-          domain: light
-    ampoule_4:
-      name: Ampoule 4
-      selector:
-        entity:
-          domain: light
+        target:
+          entity:
+            domain: light
+        multiple: true
     repetitions:
       name: Nombre de cycles
       default: 10
       selector:
         number:
           min: 1
-          max: 50
+          max: 100
           unit_of_measurement: "x"
           mode: slider
 
 trigger: []
 
-mode: single
+condition: []
 
 action:
   - repeat:
       count: !input repetitions
       sequence:
-        - service: light.turn_on
-          data:
-            entity_id: !input ampoule_1
-            rgb_color: [255, 60, 10]
-            brightness: 180
-            transition: 1.5
-        - service: light.turn_on
-          data:
-            entity_id: !input ampoule_2
-            rgb_color: [230, 100, 20]
-            brightness: 200
-            transition: 1.5
-        - service: light.turn_on
-          data:
-            entity_id: !input ampoule_3
-            rgb_color: [255, 120, 40]
-            brightness: 190
-            transition: 1.5
-        - service: light.turn_on
-          data:
-            entity_id: !input ampoule_4
-            rgb_color: [200, 80, 30]
-            brightness: 170
-            transition: 1.5
+        - variables:
+            couleurs1: [[255, 60, 10], [230, 100, 20], [255, 120, 40], [200, 80, 30]]
+            couleurs2: [[220, 40, 5], [255, 90, 30], [240, 70, 15], [255, 110, 60]]
+        - repeat:
+            for_each: !input ampoules
+            sequence:
+              - service: light.turn_on
+                data:
+                  rgb_color: "{{ couleurs1[loop.index0 % couleurs1 | length] }}"
+                  brightness: 180
+                  transition: 1.5
+                target:
+                  entity_id: "{{ repeat.item }}"
         - delay: "00:00:02"
-        - service: light.turn_on
-          data:
-            entity_id: !input ampoule_1
-            rgb_color: [220, 40, 5]
-            brightness: 150
-            transition: 1.5
-        - service: light.turn_on
-          data:
-            entity_id: !input ampoule_2
-            rgb_color: [255, 90, 30]
-            brightness: 210
-            transition: 1.5
-        - service: light.turn_on
-          data:
-            entity_id: !input ampoule_3
-            rgb_color: [240, 70, 15]
-            brightness: 180
-            transition: 1.5
-        - service: light.turn_on
-          data:
-            entity_id: !input ampoule_4
-            rgb_color: [255, 110, 60]
-            brightness: 200
-            transition: 1.5
+        - repeat:
+            for_each: !input ampoules
+            sequence:
+              - service: light.turn_on
+                data:
+                  rgb_color: "{{ couleurs2[loop.index0 % couleurs2 | length] }}"
+                  brightness: 190
+                  transition: 1.5
+                target:
+                  entity_id: "{{ repeat.item }}"
         - delay: "00:00:02"
