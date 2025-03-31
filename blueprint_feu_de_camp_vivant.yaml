@@ -6,10 +6,9 @@ blueprint:
     ampoules:
       name: Ampoules RGB
       selector:
-        target:
-          entity:
-            domain: light
-        multiple: true
+        entity:
+          domain: light
+          multiple: true
     repetitions:
       name: Nombre de cycles
       default: 10
