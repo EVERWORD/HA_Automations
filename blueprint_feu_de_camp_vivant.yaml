@@ -1,10 +1,10 @@
 blueprint:
-  name: Feu de Camp Flexible (multi-ampoules RGB)
-  description: Simule un feu de camp avec des couleurs chaudes variant doucement sur un nombre illimité d'ampoules RGB.
+  name: Feu de Camp (optimisé IKEA - Color Temp)
+  description: Effet feu de camp simulé via des variations de température de couleur, compatible avec ampoules IKEA TRÅDFRI.
   domain: automation
   input:
     ampoules:
-      name: Ampoules RGB
+      name: Ampoules IKEA
       selector:
         entity:
           domain: light
@@ -28,17 +28,17 @@ action:
       count: !input repetitions
       sequence:
         - variables:
-            couleurs1: [[255, 60, 10], [230, 100, 20], [255, 120, 40], [200, 80, 30]]
-            couleurs2: [[220, 40, 5], [255, 90, 30], [240, 70, 15], [255, 110, 60]]
+            temp_1: [370, 400, 450, 500]
+            temp_2: [330, 370, 420, 460]
         - repeat:
             for_each: !input ampoules
             sequence:
               - service: light.turn_on
                 data:
                   entity_id: "{{ repeat.item }}"
-                  rgb_color: "{{ couleurs1[loop.index0 % couleurs1 | length] }}"
-                  brightness: 180
-                  transition: 1.5
+                  color_temp: "{{ temp_1[loop.index0 % temp_1 | length] }}"
+                  brightness: 200
+                  transition: 1
         - delay: "00:00:02"
         - repeat:
             for_each: !input ampoules
@@ -46,7 +46,7 @@ action:
               - service: light.turn_on
                 data:
                   entity_id: "{{ repeat.item }}"
-                  rgb_color: "{{ couleurs2[loop.index0 % couleurs2 | length] }}"
-                  brightness: 190
-                  transition: 1.5
+                  color_temp: "{{ temp_2[loop.index0 % temp_2 | length] }}"
+                  brightness: 170
+                  transition: 1
         - delay: "00:00:02"
