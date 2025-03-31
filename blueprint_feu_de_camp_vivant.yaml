@@ -1,8 +1,8 @@
 blueprint:
-  name: Feu de Camp RGB (IKEA-compatible, version finale)
+  name: Feu de Camp RGB (IKEA compatible)
   description: >
-    Simule un feu de camp avec variations RGB chaudes. Compatible IKEA.
-    Applique des couleurs différentes par ampoule, avec transitions douces.
+    Simule un feu de camp avec variations RGB par ampoule, avec transitions douces.
+    Version compatible avec IKEA, gérant les couleurs sans erreur de boucle.
   domain: automation
   input:
     ampoules:
@@ -26,25 +26,36 @@ trigger: []
 condition: []
 
 action:
+  - variables:
+      couleurs1: [[255, 60, 10], [255, 90, 20], [255, 120, 40], [230, 70, 30]]
+      couleurs2: [[220, 40, 5], [255, 70, 15], [255, 100, 30], [200, 50, 20]]
+      ampoules_indexees: >
+        {% set out = [] %}
+        {% for i in range(ampoules | length) %}
+          {% set out = out + [ {'entity_id': ampoules[i], 'index': i} ] %}
+        {% endfor %}
+        {{ out }}
+
   - repeat:
       count: !input repetitions
       sequence:
-        - variables:
-            couleurs1: [[255, 60, 10], [255, 90, 20], [255, 120, 40], [230, 70, 30]]
-            couleurs2: [[220, 40, 5], [255, 70, 15], [255, 100, 30], [200, 50, 20]]
-        - variables:
-            index: 0
         - repeat:
-            for_each: !input ampoules
+            for_each: "{{ ampoules_indexees }}"
             sequence:
               - service: light.turn_on
                 data:
-                  entity_id: "{{ repeat.item }}"
-                  rgb_color: "{{ couleurs1[index % couleurs1 | length] }}"
+                  entity_id: "{{ repeat.item.entity_id }}"
+                  rgb_color: "{{ couleurs1[repeat.item.index % couleurs1 | length] }}"
                   brightness: 200
                   transition: 3
-              - variables:
-                  index: "{{ index + 1 }}"
         - delay: "00:00:05"
-        - variables:
-            index: 0
+        - repeat:
+            for_each: "{{ ampoules_indexees }}"
+            sequence:
+              - service: light.turn_on
+                data:
+                  entity_id: "{{ repeat.item.entity_id }}"
+                  rgb_color: "{{ couleurs2[repeat.item.index % couleurs2 | length] }}"
+                  brightness: 180
+                  transition: 3
+        - delay: "00:00:05"
