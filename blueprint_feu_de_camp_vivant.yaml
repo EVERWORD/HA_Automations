@@ -1,12 +1,13 @@
 blueprint:
-  name: Feu de Camp RGB (Version 100% stable)
+  name: Feu de Camp RGB (Script)
   description: >
-    Simule un feu de camp avec des teintes RGB chaudes différentes par ampoule.
-    Gestion dynamique des couleurs avec transitions lentes.
-  domain: automation
+    Simule un feu de camp RGB chaud, en attribuant des teintes différentes à chaque ampoule.
+    Fonctionne avec des ampoules IKEA RGB, avec transitions lentes pour éviter les erreurs.
+  domain: script
   input:
     ampoules:
       name: Ampoules RGB
+      description: Sélectionne les ampoules RGB à inclure
       selector:
         entity:
           domain: light
@@ -18,20 +19,25 @@ blueprint:
         number:
           min: 1
           max: 30
-          unit_of_measurement: "x"
           mode: slider
+          unit_of_measurement: "x"
 
-trigger: []
-
-condition: []
-
-action:
+sequence:
+  - variables:
+      couleurs1:
+        - [255, 60, 10]
+        - [255, 90, 20]
+        - [255, 120, 40]
+        - [230, 70, 30]
+      couleurs2:
+        - [220, 40, 5]
+        - [255, 70, 15]
+        - [255, 100, 30]
+        - [200, 50, 20]
   - repeat:
       count: !input repetitions
       sequence:
         - variables:
-            couleurs1: [[255, 60, 10], [255, 90, 20], [255, 120, 40], [230, 70, 30]]
-            couleurs2: [[220, 40, 5], [255, 70, 15], [255, 100, 30], [200, 50, 20]]
             ampoules_indexees: >
               {% set out = [] %}
               {% for i in range(ampoules | length) %}
@@ -58,3 +64,5 @@ action:
                   brightness: 180
                   transition: 3
         - delay: "00:00:05"
+
+mode: single
