@@ -1,12 +1,12 @@
 blueprint:
-  name: Feu de Camp RGB (IKEA compatible)
+  name: Feu de Camp RGB (version stable avec index dynamique)
   description: >
-    Simule un feu de camp avec variations RGB par ampoule, avec transitions douces.
-    Version compatible avec IKEA, gérant les couleurs sans erreur de boucle.
+    Simule un feu de camp RGB avec couleurs chaudes, compatible IKEA.
+    L'effet attribue des couleurs différentes à chaque ampoule à chaque étape.
   domain: automation
   input:
     ampoules:
-      name: Ampoules RGB IKEA
+      name: Ampoules RGB
       selector:
         entity:
           domain: light
@@ -26,21 +26,19 @@ trigger: []
 condition: []
 
 action:
-  - variables:
-      couleurs1: [[255, 60, 10], [255, 90, 20], [255, 120, 40], [230, 70, 30]]
-      couleurs2: [[220, 40, 5], [255, 70, 15], [255, 100, 30], [200, 50, 20]]
-      ampoules_indexees: >
-        {% set out = [] %}
-        {% for i in range(ampoules | length) %}
-          {% set out = out + [ {'entity_id': ampoules[i], 'index': i} ] %}
-        {% endfor %}
-        {{ out }}
-
   - repeat:
       count: !input repetitions
       sequence:
+        - variables:
+            couleurs1: [[255, 60, 10], [255, 90, 20], [255, 120, 40], [230, 70, 30]]
+            couleurs2: [[220, 40, 5], [255, 70, 15], [255, 100, 30], [200, 50, 20]]
         - repeat:
-            for_each: "{{ ampoules_indexees }}"
+            for_each: >
+              {% set result = [] %}
+              {% for i in range(inputs.ampoules | length) %}
+                {% set result = result + [{'entity_id': inputs.ampoules[i], 'index': i}] %}
+              {% endfor %}
+              {{ result }}
             sequence:
               - service: light.turn_on
                 data:
@@ -50,7 +48,12 @@ action:
                   transition: 3
         - delay: "00:00:05"
         - repeat:
-            for_each: "{{ ampoules_indexees }}"
+            for_each: >
+              {% set result = [] %}
+              {% for i in range(inputs.ampoules | length) %}
+                {% set result = result + [{'entity_id': inputs.ampoules[i], 'index': i}] %}
+              {% endfor %}
+              {{ result }}
             sequence:
               - service: light.turn_on
                 data:
