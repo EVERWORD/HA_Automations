@@ -1,8 +1,9 @@
 blueprint:
-  name: Feu de Camp RGB (version stable avec index dynamique)
+  name: Feu de Camp RGB (version stable indexée)
   description: >
-    Simule un feu de camp RGB avec couleurs chaudes, compatible IKEA.
-    L'effet attribue des couleurs différentes à chaque ampoule à chaque étape.
+    Simule un feu de camp RGB avec variations chaudes par ampoule.
+    Gère dynamiquement l’index de chaque ampoule pour les colorer différemment.
+    Compatible IKEA RGB.
   domain: automation
   input:
     ampoules:
@@ -35,8 +36,8 @@ action:
         - repeat:
             for_each: >
               {% set result = [] %}
-              {% for i in range(inputs.ampoules | length) %}
-                {% set result = result + [{'entity_id': inputs.ampoules[i], 'index': i}] %}
+              {% for i in range(ampoules | length) %}
+                {% set result = result + [{'entity_id': ampoules[i], 'index': i}] %}
               {% endfor %}
               {{ result }}
             sequence:
@@ -50,8 +51,8 @@ action:
         - repeat:
             for_each: >
               {% set result = [] %}
-              {% for i in range(inputs.ampoules | length) %}
-                {% set result = result + [{'entity_id': inputs.ampoules[i], 'index': i}] %}
+              {% for i in range(ampoules | length) %}
+                {% set result = result + [{'entity_id': ampoules[i], 'index': i}] %}
               {% endfor %}
               {{ result }}
             sequence:
